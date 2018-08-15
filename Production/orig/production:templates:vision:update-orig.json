@@ -1,0 +1,96 @@
+{
+  "Job":{
+    "Region":"us-west-2",
+    "ID":"{{ environment }}-{{ product }}",
+    "Name":"{{ environment }}-{{ product }}",
+    "Type":"batch",
+    "Priority":50,
+    "AllAtOnce":false,
+    "Datacenters":[
+      "us-west-2a"
+    ],
+    "TaskGroups":[
+      {
+        "Name":"{{ environment }}-{{ product }}",
+        "Count":2,
+        "Constraints": [{
+            "LTarget": "${node.class}",
+            "RTarget": "{{ environment }}_gpu",
+            "Operand": "="
+        }],
+        "Tasks":[
+        {
+            "Name":"{{ environment }}-{{ product }}-predeploy",
+            "Driver":"raw_exec",
+            "User":"root",
+            "Config":{
+              "command":"/usr/local/bin/nvidia-docker-predeploy",
+              "args":["{{ product }}"]
+            },
+            "Constraints":null,
+            "KillTimeout":5000000000,
+            "LogConfig":{
+                "MaxFiles":10,
+                "MaxFileSizeMB":10
+            }
+          },
+          {
+            "Name":"{{ environment }}-{{ product }}",
+            "Driver":"raw_exec",
+            "User":"root",
+            "Config":{
+              "command":"/usr/bin/nvidia-docker",
+              "args":[
+                   "run", "-d", "-p", "${NOMAD_PORT_web}:5000",
+                    {% for key, value in runtime.iteritems() %}"-e", "{{ key }}={{ value }}",{% endfor %}
+                    "--log-driver", "syslog",
+                    "--log-opt", "syslog-facility=daemon",
+                    "--log-opt", "tag=${NOMAD_ALLOC_NAME}/{{ environment }}/{{ product }}/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
+                    "--log-opt", "syslog-address=tcp://syslog.service.consul:514",
+                    "--log-opt", "syslog-format=rfc3164",
+                   "{{ image }}_gpu"
+              ]
+            },
+            "Constraints":null,
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
+            "Resources":{
+              "CPU":2000,
+              "MemoryMB":35840,
+              "IOPS":0,
+              "Networks":[
+                {
+                "ReservedPorts":[
+                    {
+                      "Value": 5000,
+                      "Label":"web"
+                    }
+                  ],
+                "MBits":50
+                }
+              ]
+            },
+            "Meta":{
+              "foo":"bar",
+              "baz":"pipe"
+            },
+            "KillTimeout":5000000000,
+            "LogConfig":{
+                "MaxFiles":10,
+                "MaxFileSizeMB":10
+            }
+          }
+        ],
+        "RestartPolicy":{
+          "Interval":90000000000,
+          "Attempts":1,
+          "Delay":15000000000,
+          "Mode":"delay"
+        }
+      }
+    ]
+  }
+}
