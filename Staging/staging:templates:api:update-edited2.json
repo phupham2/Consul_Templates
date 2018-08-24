@@ -12,15 +12,11 @@
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
-        "Count":2,
+        "Count":4,
         "Constraints": [{
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-            },
-            {
-            "Operand": "distinct_hosts",
-            "Value": true
             }
           ],
         "Tasks":[
@@ -33,32 +29,14 @@
                 {
                   "web":8080
                 }
-              ],
-              "logging": [
-                {
-                  "config": [
-                    {
-                      "syslog-address": "tcp://syslog.service.consul:514",
-                      "tag": "${NOMAD_ALLOC_NAME}/{{ environment }}/{{ product }}/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
-                      "syslog-facility": "daemon",
-                      "syslog-format": "rfc3164"
-                    }
-                  ],
-                  "type": "syslog"
-                }
-              ],
-              "auth":[{
-                  "username":"{{ credentials.username }}",
-                  "password":"{{ credentials.password }}",
-                  "email":"{{ credentials.email }}"
-                }]
+              ]
             },
             "Constraints":null,
             "Templates": [
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",
@@ -92,8 +70,8 @@
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":1024,
+              "CPU":300,
+              "MemoryMB":512,
               "IOPS":0,
               "Networks":[
                 {
@@ -116,35 +94,35 @@
                 "MaxFileSizeMB":10
             }
           },
-          {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
+            {
+              "Name":"{{ environment }}-{{ product }}-rsyslog",
+              "Driver":"docker",
+              "Config":{
+                "image":"blinker/rsyslog:latest",
+                "hostname": "${attr.unique.hostname}"
+              },
+              "Constraints":null,
+              "Services":[
+                {
+                  "Name":"rsyslog",
+                  "Tags":[
+                    "{{ product }}",
+                    "{{ environment }}"
+                  ]
+                }
+              ],
+              "Resources":{
+                "CPU":100,
+                "MemoryMB":16,
+                "IOPS":0
+              },
+              "KillTimeout":5000000000,
+              "LogConfig":{
+                "MaxFiles":10,
+                "MaxFileSizeMB":10
               }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
             }
-          }
-        ],
+          ],
         "RestartPolicy":{
           "Interval":90000000000,
           "Attempts":5,

@@ -33,25 +33,7 @@
                 {
                   "web":8080
                 }
-              ],
-              "logging": [
-                {
-                  "config": [
-                    {
-                      "syslog-address": "tcp://syslog.service.consul:514",
-                      "tag": "${NOMAD_ALLOC_NAME}/{{ environment }}/{{ product }}/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
-                      "syslog-facility": "daemon",
-                      "syslog-format": "rfc3164"
-                    }
-                  ],
-                  "type": "syslog"
-                }
-              ],
-              "auth":[{
-                  "username":"{{ credentials.username }}",
-                  "password":"{{ credentials.password }}",
-                  "email":"{{ credentials.email }}"
-                }]
+              ]
             },
             "Constraints":null,
             "Templates": [

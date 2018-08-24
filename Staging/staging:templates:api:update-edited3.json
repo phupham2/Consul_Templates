@@ -12,17 +12,15 @@
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
-        "Count":2,
+        "Count":4,
         "Constraints": [{
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-            },
-            {
-            "Operand": "distinct_hosts",
-            "Value": true
-            }
-          ],
+        },
+        {
+            "Operand": "distinct_hosts"
+          }],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
@@ -33,25 +31,7 @@
                 {
                   "web":8080
                 }
-              ],
-              "logging": [
-                {
-                  "config": [
-                    {
-                      "syslog-address": "tcp://syslog.service.consul:514",
-                      "tag": "${NOMAD_ALLOC_NAME}/{{ environment }}/{{ product }}/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
-                      "syslog-facility": "daemon",
-                      "syslog-format": "rfc3164"
-                    }
-                  ],
-                  "type": "syslog"
-                }
-              ],
-              "auth":[{
-                  "username":"{{ credentials.username }}",
-                  "password":"{{ credentials.password }}",
-                  "email":"{{ credentials.email }}"
-                }]
+              ]
             },
             "Constraints":null,
             "Templates": [
@@ -89,11 +69,39 @@
                     "Timeout":2000000000
                   }
                 ]
+              },
+              {
+                "Name":"{{ environment }}-{{ product }}-rsyslog",
+                "Driver":"docker",
+                "Config":{
+                  "image":"blinker/rsyslog:latest",
+                  "hostname": "${attr.unique.hostname}"
+                },
+                "Constraints":null,
+                "Services":[
+                  {
+                    "Name":"rsyslog",
+                    "Tags":[
+                      "{{ product }}",
+                      "{{ environment }}"
+                    ]
+                  }
+                ],
+                "Resources":{
+                  "CPU":100,
+                  "MemoryMB":16,
+                  "IOPS":0
+                },
+                "KillTimeout":5000000000,
+                "LogConfig":{
+                  "MaxFiles":10,
+                  "MaxFileSizeMB":10
+                }
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":1024,
+              "CPU":300,
+              "MemoryMB":512,
               "IOPS":0,
               "Networks":[
                 {
@@ -114,34 +122,6 @@
             "LogConfig":{
                 "MaxFiles":10,
                 "MaxFileSizeMB":10
-            }
-          },
-          {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
             }
           }
         ],
