@@ -22,11 +22,12 @@
             "Operand": "distinct_hosts",
             "Value": true
             }
-          ],
+        ],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
@@ -54,6 +55,11 @@
                 }]
             },
             "Constraints":null,
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Templates": [
               {
                 "SourcePath": "",
@@ -116,7 +122,7 @@
                 "MaxFileSizeMB":10
             }
           },
-          {
+            {
             "Name":"{{ environment }}-{{ product }}-rsyslog",
             "Driver":"docker",
             "Config":{
