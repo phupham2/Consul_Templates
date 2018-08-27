@@ -1,14 +1,15 @@
 {
-  "Job":{
-    "Region":"us-west-2",
-    "ID":"{{ environment }}-{{ product }}",
-    "Name":"{{ environment }}-{{ product }}",
-    "Type":"service",
-    "Priority":50,
-    "AllAtOnce":false,
-    "Datacenters":[
+  "Job": {
+    "Region": "us-west-2",
+    "ID": "{{ environment }}-{{ product }}",
+    "Name": "{{ environment }}-{{ product }}",
+    "Type": "service",
+    "Priority": 50,
+    "AllAtOnce": false,
+    "Datacenters": [
       "us-west-2a"
-    ],
+    ]
+  },
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
