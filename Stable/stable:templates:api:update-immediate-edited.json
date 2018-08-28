@@ -146,11 +146,14 @@
             ],
             "Resources":{
               "CPU":200,
-              "MemoryMB":384,
+              "MemoryMB":256,
               "IOPS":0,
               "Networks":[ { "MBits":10 } ]
             },
-            "Meta":{},
+            "Meta":{
+              "foo":"bar",
+              "baz":"pipe"
+            },
             "KillTimeout":5000000000,
             "LogConfig":{
                 "MaxFiles":10,

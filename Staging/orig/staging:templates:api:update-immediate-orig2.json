@@ -28,20 +28,31 @@
               "port_map":[ ],
               "command": "bundle",
               "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ],
+              "logging": [
+                {
+                  "config": [
+                    {
+                      "syslog-address": "tcp://syslog.service.consul:514",
+                      "tag": "${NOMAD_ALLOC_NAME}/{{ environment }}/sidekiq/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
+                      "syslog-facility": "daemon",
+                      "syslog-format": "rfc3164"
+                    }
+                  ],
+                  "type": "syslog"
+                }
+              ],
+              "auth":[{
+                  "username":"{{ credentials.username }}",
+                  "password":"{{ credentials.password }}",
+                  "email":"{{ credentials.email }}"
+                }]
             },
             "Constraints":null,
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))"
-              }
-            ],
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Services":[
               {
                 "Name":"{{ environment }}-sidekiq",
@@ -63,34 +74,6 @@
             "LogConfig":{
                 "MaxFiles":10,
                 "MaxFileSizeMB":10
-            }
-          },
-          {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
             }
           }
         ],
@@ -119,20 +102,31 @@
               "port_map":[ ],
               "command":"bundle",
               "args":["exec", "clockwork", "./config/schedule.rb"],
+              "logging": [
+                {
+                  "config": [
+                    {
+                      "syslog-address": "tcp://syslog.service.consul:514",
+                      "tag": "${NOMAD_ALLOC_NAME}/{{ environment }}/clockwork/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
+                      "syslog-facility": "daemon",
+                      "syslog-format": "rfc3164"
+                    }
+                  ],
+                  "type": "syslog"
+                }
+              ],
+              "auth":[{
+                  "username":"{{ credentials.username }}",
+                  "password":"{{ credentials.password }}",
+                  "email":"{{ credentials.email }}"
+                }]
             },
             "Constraints":null,
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))"
-              }
-            ],
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Services":[
               {
                 "Name":"{{ environment }}-clockwork",
@@ -155,34 +149,6 @@
             "LogConfig":{
                 "MaxFiles":10,
                 "MaxFileSizeMB":10
-            }
-          },
-          {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
             }
           }
         ]
