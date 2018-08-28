@@ -17,16 +17,17 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-            },
-            {
+          },
+          {
             "Operand": "distinct_hosts",
             "Value": true
-            }
+          }
         ],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
@@ -40,7 +41,7 @@
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}/default\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",
@@ -84,8 +85,7 @@
                     {
                       "Label":"web"
                     }
-                  ],
-                  "MBits":10
+                  ]
                 }
               ]
             },

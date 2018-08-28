@@ -17,16 +17,17 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-            },
-            {
+          },
+          {
             "Operand": "distinct_hosts",
             "Value": true
-            }
+          }
         ],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
@@ -84,8 +85,7 @@
                     {
                       "Label":"web"
                     }
-                  ],
-                  "MBits":10
+                  ]
                 }
               ]
             },

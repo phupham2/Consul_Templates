@@ -36,13 +36,12 @@
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",
-                "RightDelim": "))",
-                "Envvars": true
+                "RightDelim": "))"
               }
             ],
             "Services":[
