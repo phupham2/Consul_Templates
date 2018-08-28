@@ -54,8 +54,8 @@
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":2048,
+              "CPU":300,
+              "MemoryMB":512,
               "IOPS":0,
               "Networks":[ { "MBits":10 } ]
             },
@@ -66,33 +66,33 @@
             }
           },
           {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
+          "Name":"{{ environment }}-{{ product }}-rsyslog",
+          "Driver":"docker",
+          "Config":{
+            "image":"blinker/rsyslog:latest",
+            "hostname": "${attr.unique.hostname}"
+          },
+          "Constraints":null,
+          "Services":[
+            {
+              "Name":"rsyslog",
+              "Tags":[
+                "{{ product }}",
+                "{{ environment }}"
+              ]
             }
+          ],
+          "Resources":{
+            "CPU":100,
+            "MemoryMB":16,
+            "IOPS":0
+          },
+          "KillTimeout":5000000000,
+          "LogConfig":{
+            "MaxFiles":10,
+            "MaxFileSizeMB":10
           }
+        }
         ],
         "RestartPolicy":{
           "Interval":90000000000,
@@ -145,8 +145,8 @@
               }
             ],
             "Resources":{
-              "CPU":200,
-              "MemoryMB":384,
+              "CPU":500,
+              "MemoryMB":1024,
               "IOPS":0,
               "Networks":[ { "MBits":10 } ]
             },
@@ -158,33 +158,33 @@
             }
           },
           {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
+          "Name":"{{ environment }}-{{ product }}-rsyslog",
+          "Driver":"docker",
+          "Config":{
+            "image":"blinker/rsyslog:latest",
+            "hostname": "${attr.unique.hostname}"
+          },
+          "Constraints":null,
+          "Services":[
+            {
+              "Name":"rsyslog",
+              "Tags":[
+                "{{ product }}",
+                "{{ environment }}"
+              ]
             }
+          ],
+          "Resources":{
+            "CPU":100,
+            "MemoryMB":16,
+            "IOPS":0
+          },
+          "KillTimeout":5000000000,
+          "LogConfig":{
+            "MaxFiles":10,
+            "MaxFileSizeMB":10
           }
+        }
         ]
       }
     ]
