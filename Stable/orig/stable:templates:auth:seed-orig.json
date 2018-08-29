@@ -1,0 +1,89 @@
+{
+  "Job":{
+    "Region":"us-west-2",
+    "ID":"{{ environment }}-{{ product }}-batch",
+    "Name":"{{ environment }}-{{ product }}-batch",
+    "Type":"batch",
+    "Priority":50,
+    "AllAtOnce":false,
+    "Datacenters":[
+      "us-west-2a"
+    ],
+    "Constraints": [{
+        "LTarget": "${node.class}",
+        "RTarget": "{{ environment }}_app",
+        "Operand": "="
+    }],
+    "TaskGroups":[
+      {
+        "Name":"{{ environment }}-{{ product }}-batch",
+        "Count":1,
+        "Constraints":null,
+        "Tasks":[
+          {
+            "Name":"{{ environment }}-{{ product }}-batch",
+            "Driver":"docker",
+            "User":"root",
+            "Config":{
+              "image":"{{ image }}",
+              "args":[
+                  "db", "seed"
+              ],
+              "logging": [
+                {
+                  "config": [
+                    {
+                      "syslog-address": "tcp://syslog.service.consul:514",
+                      "tag": "${NOMAD_ALLOC_NAME}/{{ environment }}/{{ product }}/{{ '{{' }} .ImageName {{ '}}' }}/{{ '{{' }} .Name {{ '}}' }}/{{ '{{' }} .ID {{ '}}' }}",
+                      "syslog-facility": "daemon",
+                      "syslog-format": "rfc3164"
+                    }
+                  ],
+                  "type": "syslog"
+                }
+              ],
+              "auth":[{
+                  "username":"{{ credentials.username }}",
+                  "password":"{{ credentials.password }}",
+                  "email":"{{ credentials.email }}"
+                }]
+            },
+            "Constraints":null,
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
+            "Services":[
+              {
+                "Name":"{{ environment }}-{{ product }}-batch",
+                "Tags":[
+                  "{{ product }}",
+                  "{{ environment }}",
+                  "batch"
+                ]
+              }
+            ],
+            "Resources":{
+              "CPU":500,
+              "MemoryMB":256,
+              "IOPS":0,
+              "Networks":[ { "MBits":10 } ]
+            },
+            "KillTimeout":5000000000,
+            "LogConfig":{
+                "MaxFiles":10,
+                "MaxFileSizeMB":10
+            }
+          }
+        ],
+        "RestartPolicy":{
+          "Interval":90000000000,
+          "Attempts":5,
+          "Delay":15000000000,
+          "Mode":"delay"
+        }
+      }
+    ]
+  }
+}

@@ -27,7 +27,6 @@
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
@@ -76,7 +75,7 @@
             ],
             "Resources":{
               "CPU":500,
-              "MemoryMB":128,
+              "MemoryMB":256,
               "IOPS":0,
               "Networks":[
                 {
