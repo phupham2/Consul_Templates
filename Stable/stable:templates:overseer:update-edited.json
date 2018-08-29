@@ -17,11 +17,7 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-        },
-        {
-            "Operand": "distinct_hosts",
-            "Value": true
-        }
+          }
         ],
         "Tasks":[
           {
@@ -55,7 +51,6 @@
                 "Tags":[
                   "{{ product }}",
                   "{{ environment }}",
-                  "web",
                   "internal"
                 ],
                 "PortLabel":"web",
@@ -75,8 +70,8 @@
               }
             ],
             "Resources":{
-              "CPU":400,
-              "MemoryMB":128,
+              "CPU":300,
+              "MemoryMB":256,
               "IOPS":0,
               "Networks":[
                 {
@@ -84,12 +79,11 @@
                     {
                       "Label":"web"
                     }
-                  ],
-                  "MBits":20
+                  ]
                 }
               ]
             },
-            "Meta":{},
+            "Meta":{"foo":"bar"},
             "KillTimeout":5000000000,
             "LogConfig":{
                 "MaxFiles":10,
@@ -133,9 +127,9 @@
         }
       }
     ],
-    "Update": {
-      "Stagger": {{ stagger }},
-      "MaxParallel": {{ max_parallel }}
+    "Update":{
+      "Stagger":{{ stagger }},
+      "MaxParallel":{{ max_parallel }}
     }
   }
 }
