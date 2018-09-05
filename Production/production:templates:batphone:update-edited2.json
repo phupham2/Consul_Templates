@@ -17,7 +17,8 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-        }],
+        }
+      ],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
@@ -26,7 +27,7 @@
               "image":"{{ image }}",
               "port_map":[
                 {
-                  "web":4000
+                  "web":3000
                 }
               ]
             },
@@ -35,7 +36,7 @@
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}/default\"))((.Key))=((.Value | toJSON ))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",
@@ -46,12 +47,12 @@
             ],
             "Services":[
               {
-                "Name":"{{ product }}",
+                "Name":"messaging",
                 "Tags":[
                   "{{ product }}",
                   "{{ environment }}",
                   "web",
-                  "internal"
+                  "batphone"
                 ],
                 "PortLabel":"web",
                 "Checks":[
@@ -61,16 +62,16 @@
                     "Type":"http",
                     "Command":"",
                     "Args":null,
-                    "Path":"/",
+                    "Path":"/batphone/health-check",
                     "Protocol":"",
                     "Interval":10000000000,
-                    "Timeout":4000000000
+                    "Timeout":2000000000
                   }
                 ]
               }
             ],
             "Resources":{
-              "CPU":500,
+              "CPU":100,
               "MemoryMB":512,
               "IOPS":0,
               "Networks":[
@@ -80,11 +81,14 @@
                       "Label":"web"
                     }
                   ],
-                  "MBits":40
+                  "MBits":10
                 }
               ]
             },
-            "Meta":{},
+            "Meta":{
+              "foo":"bar",
+              "baz":"pipe"
+            },
             "KillTimeout":5000000000,
             "LogConfig":{
                 "MaxFiles":10,

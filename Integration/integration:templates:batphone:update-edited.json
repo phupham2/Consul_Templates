@@ -1,15 +1,14 @@
 {
-  "Job": {
-    "Region": "us-west-2",
-    "ID": "{{ environment }}-{{ product }}",
-    "Name": "{{ environment }}-{{ product }}",
-    "Type": "service",
-    "Priority": 50,
-    "AllAtOnce": false,
-    "Datacenters": [
+  "Job":{
+    "Region":"us-west-2",
+    "ID":"{{ environment }}-{{ product }}",
+    "Name":"{{ environment }}-{{ product }}",
+    "Type":"service",
+    "Priority":50,
+    "AllAtOnce":false,
+    "Datacenters":[
       "us-west-2a"
-    ]
-  },
+    ],
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
@@ -18,11 +17,7 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-            },
-            {"Operand": "distinct_hosts",
-              "Value":  true
-            }
-          ],
+        }],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
@@ -40,7 +35,7 @@
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}/default/\"))((.Key))=((.Value | toJSON ))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",
@@ -98,6 +93,34 @@
                 "MaxFiles":10,
                 "MaxFileSizeMB":10
             }
+          },
+          {
+            "Name":"{{ environment }}-{{ product }}-rsyslog",
+            "Driver":"docker",
+            "Config":{
+              "image":"blinker/rsyslog:latest",
+              "hostname": "${attr.unique.hostname}"
+            },
+            "Constraints":null,
+            "Services":[
+              {
+                "Name":"rsyslog",
+                "Tags":[
+                  "{{ product }}",
+                  "{{ environment }}"
+                ]
+              }
+            ],
+            "Resources":{
+              "CPU":100,
+              "MemoryMB":16,
+              "IOPS":0
+            },
+            "KillTimeout":5000000000,
+            "LogConfig":{
+              "MaxFiles":10,
+              "MaxFileSizeMB":10
+            }
           }
         ],
         "RestartPolicy":{
@@ -105,34 +128,6 @@
           "Attempts":5,
           "Delay":5000000000,
           "Mode":"delay"
-        }
-      },
-      {
-        "Name":"{{ environment }}-{{ product }}-rsyslog",
-        "Driver":"docker",
-        "Config":{
-          "image":"blinker/rsyslog:latest",
-          "hostname": "${attr.unique.hostname}"
-        },
-        "Constraints":null,
-        "Services":[
-          {
-            "Name":"rsyslog",
-            "Tags":[
-              "{{ product }}",
-              "{{ environment }}"
-            ]
-          }
-        ],
-        "Resources":{
-          "CPU":100,
-          "MemoryMB":16,
-          "IOPS":0
-        },
-        "KillTimeout":5000000000,
-        "LogConfig":{
-          "MaxFiles":10,
-          "MaxFileSizeMB":10
         }
       }
     ],

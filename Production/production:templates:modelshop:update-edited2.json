@@ -15,7 +15,7 @@
         "Count":1,
         "Constraints": [{
             "LTarget": "${node.class}",
-            "RTarget": "{{ environment }}_app",
+            "RTarget": "{{ environment }}_modelshop",
             "Operand": "="
         }],
         "Tasks":[
@@ -26,7 +26,7 @@
               "image":"{{ image }}",
               "port_map":[
                 {
-                  "web":4000
+                  "web":8080
                 }
               ]
             },
@@ -46,11 +46,10 @@
             ],
             "Services":[
               {
-                "Name":"{{ product }}",
+                "Name":"{{ environment }}-{{ product }}",
                 "Tags":[
                   "{{ product }}",
                   "{{ environment }}",
-                  "web",
                   "internal"
                 ],
                 "PortLabel":"web",
@@ -61,7 +60,7 @@
                     "Type":"http",
                     "Command":"",
                     "Args":null,
-                    "Path":"/",
+                    "Path":"/modelshop/logon.jsp",
                     "Protocol":"",
                     "Interval":10000000000,
                     "Timeout":4000000000
@@ -70,21 +69,25 @@
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":512,
+              "CPU":1000,
+              "MemoryMB":4096,
               "IOPS":0,
               "Networks":[
                 {
-                  "DynamicPorts":[
+                  "ReservedPorts":[
                     {
-                      "Label":"web"
+                      "Label":"web",
+                      "Value":8080
                     }
                   ],
-                  "MBits":40
+                  "MBits":100
                 }
               ]
             },
-            "Meta":{},
+            "Meta":{
+              "foo":"bar",
+              "baz":"pipe"
+            },
             "KillTimeout":5000000000,
             "LogConfig":{
                 "MaxFiles":10,

@@ -17,16 +17,17 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-        }],
+          }
+        ],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
             "Config":{
-              "image":"{{ image }}",
+              "image":"atmoz/sftp:alpine",
               "port_map":[
                 {
-                  "web":4000
+                  "sftp":22
                 }
               ]
             },
@@ -49,45 +50,42 @@
                 "Name":"{{ product }}",
                 "Tags":[
                   "{{ product }}",
-                  "{{ environment }}",
-                  "web",
-                  "internal"
+                  "{{ environment }}"
                 ],
-                "PortLabel":"web",
+                "PortLabel":"sftp",
                 "Checks":[
                   {
                     "Id":"",
                     "Name":"{{ product }}-status",
-                    "Type":"http",
-                    "Command":"",
-                    "Args":null,
-                    "Path":"/",
-                    "Protocol":"",
+                    "Type":"tcp",
                     "Interval":10000000000,
-                    "Timeout":4000000000
+                    "Timeout":3000000000,
+                    "CheckRestart": {
+                      "Limit": 3,
+                      "Grace": 30000000000
+                    }
                   }
                 ]
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":512,
+              "CPU":100,
+              "MemoryMB":16,
               "IOPS":0,
               "Networks":[
                 {
-                  "DynamicPorts":[
+                  "ReservedPorts":[
                     {
-                      "Label":"web"
+                      "Label":"sftp",
+                      "Value":2222
                     }
-                  ],
-                  "MBits":40
+                  ]
                 }
               ]
             },
-            "Meta":{},
             "KillTimeout":5000000000,
             "LogConfig":{
-                "MaxFiles":10,
+                "MaxFiles":3,
                 "MaxFileSizeMB":10
             }
           },
@@ -121,16 +119,12 @@
           }
         ],
         "RestartPolicy":{
-          "Interval":90000000000,
+          "Interval":60000000000,
           "Attempts":5,
-          "Delay":5000000000,
+          "Delay":10000000000,
           "Mode":"delay"
         }
       }
-    ],
-    "Update":{
-      "Stagger":{{ stagger }},
-      "MaxParallel":{{ max_parallel }}
-    }
+    ]
   }
 }
