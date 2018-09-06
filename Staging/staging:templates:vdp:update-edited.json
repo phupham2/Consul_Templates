@@ -17,10 +17,6 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-        },
-        {
-            "Operand": "distinct_hosts",
-            "Value": true
         }],
         "Tasks":[
           {
