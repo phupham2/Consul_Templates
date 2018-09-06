@@ -65,7 +65,7 @@
             ],
             "Resources":{
               "CPU":200,
-              "MemoryMB":200,
+              "MemoryMB":512,
               "IOPS":0,
               "Networks":[
                 {
