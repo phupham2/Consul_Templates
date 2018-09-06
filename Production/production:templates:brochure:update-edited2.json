@@ -37,6 +37,19 @@
               ]
             },
             "Constraints":null,
+            "Templates": [
+              {
+                "SourcePath": "",
+                "DestPath": "secrets/vars.env",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}/default\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "ChangeMode": "noop",
+                "ChangeSignal": "",
+                "Perms": "0644",
+                "LeftDelim": "((",
+                "RightDelim": "))",
+                "Envvars": true
+              }
+            ],
             "Services":[
               {
                 "Name":"www",
@@ -64,7 +77,7 @@
             ],
             "Resources":{
               "CPU":200,
-              "MemoryMB":200,
+              "MemoryMB":512,
               "IOPS":0,
               "Networks":[
                 {
