@@ -122,7 +122,11 @@
                 }]
             },
             "Constraints":null,
-
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Services":[
               {
                 "Name":"{{ environment }}-clockwork",
