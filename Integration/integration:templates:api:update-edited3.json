@@ -99,7 +99,7 @@
                 "MaxFileSizeMB":10
             }
           },
-            {
+          {
             "Name":"{{ environment }}-{{ product }}-rsyslog",
             "Driver":"docker",
             "Config":{
