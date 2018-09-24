@@ -22,7 +22,6 @@
           {
             "Name":"{{ environment }}-sidekiq",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[ ],
@@ -30,18 +29,12 @@
               "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ],
             },
             "Constraints":null,
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))"
-              }
-            ],
+            "Env":{
+                "MALLOC_ARENA_MAX": "2",
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Services":[
               {
                 "Name":"{{ environment }}-sidekiq",
@@ -121,18 +114,11 @@
               "args":["exec", "clockwork", "./config/schedule.rb"],
             },
             "Constraints":null,
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))"
-              }
-            ],
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Services":[
               {
                 "Name":"{{ environment }}-clockwork",
