@@ -29,13 +29,9 @@
               "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ],
             },
             "Constraints":null,
-            "Env":{
-                {% for key, value in runtime.iteritems() %}
-                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
-                {% endfor %}
-            },
             "Templates": [
               {
+                "MALLOC_ARENA_MAX": "2",
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
                 "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",

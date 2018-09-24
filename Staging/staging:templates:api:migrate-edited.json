@@ -24,7 +24,6 @@
             "Name":"{{ environment }}-{{ product }}-batch",
             "Leader": "true",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "command": "bundle",
@@ -46,6 +45,7 @@
                     {% endif %}
                 {% endfor %}
             },
+            "Leader":true,
             "Services":[
               {
                 "Name":"{{ environment }}-{{ product }}-batch",

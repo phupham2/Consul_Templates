@@ -49,6 +49,7 @@
             },
             "Constraints":null,
             "Env":{
+                "MALLOC_ARENA_MAX": "2",
                 {% for key, value in runtime.iteritems() %}
                 "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
                 {% endfor %}
