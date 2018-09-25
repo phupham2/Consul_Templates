@@ -22,7 +22,6 @@
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}-batch",
-            "Leader": "true",
             "Driver":"docker",
             "Config":{
               "image":"{{ image }}",

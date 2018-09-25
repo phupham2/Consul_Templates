@@ -1,4 +1,4 @@
-p{
+{
   "Job":{
     "Region":"us-west-2",
     "ID":"{{ environment }}-{{ product }}",
