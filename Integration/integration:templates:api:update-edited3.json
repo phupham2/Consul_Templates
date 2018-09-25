@@ -27,7 +27,6 @@
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
@@ -46,7 +45,8 @@
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",
-                "RightDelim": "))"
+                "RightDelim": "))",
+                "Envvars": true
               }
             ],
             "Services":[
@@ -99,7 +99,7 @@
                 "MaxFileSizeMB":10
             }
           },
-            {
+          {
             "Name":"{{ environment }}-{{ product }}-rsyslog",
             "Driver":"docker",
             "Config":{

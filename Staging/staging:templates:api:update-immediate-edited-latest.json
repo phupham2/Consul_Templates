@@ -27,7 +27,7 @@
               "image":"{{ image }}",
               "port_map":[ ],
               "command": "bundle",
-              "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ]
+              "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ],
             },
             "Constraints":null,
             "Env":{
@@ -36,18 +36,6 @@
                 "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
                 {% endfor %}
             },
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))"
-              }
-            ],
             "Services":[
               {
                 "Name":"{{ environment }}-sidekiq",
@@ -60,8 +48,8 @@
               }
             ],
             "Resources":{
-              "CPU":300,
-              "MemoryMB":512,
+              "CPU":500,
+              "MemoryMB":2048,
               "IOPS":0,
               "Networks":[ { "MBits":10 } ]
             },
@@ -70,35 +58,7 @@
                 "MaxFiles":10,
                 "MaxFileSizeMB":10
             }
-          },
-          {
-          "Name":"{{ environment }}-{{ product }}-rsyslog",
-          "Driver":"docker",
-          "Config":{
-            "image":"blinker/rsyslog:latest",
-            "hostname": "${attr.unique.hostname}"
-          },
-          "Constraints":null,
-          "Services":[
-            {
-              "Name":"rsyslog",
-              "Tags":[
-                "{{ product }}",
-                "{{ environment }}"
-              ]
-            }
-          ],
-          "Resources":{
-            "CPU":100,
-            "MemoryMB":16,
-            "IOPS":0
-          },
-          "KillTimeout":5000000000,
-          "LogConfig":{
-            "MaxFiles":10,
-            "MaxFileSizeMB":10
           }
-        }
         ],
         "RestartPolicy":{
           "Interval":90000000000,
@@ -132,18 +92,6 @@
                 "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
                 {% endfor %}
             },
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))"
-              }
-            ],
             "Services":[
               {
                 "Name":"{{ environment }}-clockwork",
@@ -156,8 +104,8 @@
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":1024,
+              "CPU":200,
+              "MemoryMB":384,
               "IOPS":0,
               "Networks":[ { "MBits":10 } ]
             },
@@ -167,35 +115,7 @@
                 "MaxFiles":10,
                 "MaxFileSizeMB":10
             }
-          },
-          {
-          "Name":"{{ environment }}-{{ product }}-rsyslog",
-          "Driver":"docker",
-          "Config":{
-            "image":"blinker/rsyslog:latest",
-            "hostname": "${attr.unique.hostname}"
-          },
-          "Constraints":null,
-          "Services":[
-            {
-              "Name":"rsyslog",
-              "Tags":[
-                "{{ product }}",
-                "{{ environment }}"
-              ]
-            }
-          ],
-          "Resources":{
-            "CPU":100,
-            "MemoryMB":16,
-            "IOPS":0
-          },
-          "KillTimeout":5000000000,
-          "LogConfig":{
-            "MaxFiles":10,
-            "MaxFileSizeMB":10
           }
-        }
         ]
       }
     ]

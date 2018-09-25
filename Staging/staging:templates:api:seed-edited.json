@@ -1,79 +1,66 @@
 {
   "Job":{
     "Region":"us-west-2",
-    "ID":"{{ environment }}-{{ product }}",
-    "Name":"{{ environment }}-{{ product }}",
-    "Type":"service",
+    "ID":"{{ environment }}-{{ product }}-batch",
+    "Name":"{{ environment }}-{{ product }}-batch",
+    "Type":"batch",
     "Priority":50,
     "AllAtOnce":false,
     "Datacenters":[
       "us-west-2a"
     ],
+    "Constraints": [{
+        "LTarget": "${node.class}",
+        "RTarget": "{{ environment }}_app",
+        "Operand": "="
+    }],
     "TaskGroups":[
       {
-        "Name":"{{ environment }}-{{ product }}",
+        "Name":"{{ environment }}-{{ product }}-batch",
         "Count":1,
-        "Constraints": [{
-            "LTarget": "${node.class}",
-            "RTarget": "{{ environment }}_refimenow",
-            "Operand": "="
-        }],
+        "Constraints":null,
         "Tasks":[
           {
-            "Name":"{{ environment }}-{{ product }}",
+            "Name":"{{ environment }}-{{ product }}-batch",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
-              "port_map":[
-                {
-                  "web":5000
-                }
-              ],
-              "volumes": [
-                  "/tmp/refimenow-db:/tmp/refimenow-db"
+              "command": "bundle",
+              "args":[
+                  "exec", "rake", "db:seed:{{ environment }}"
               ]
             },
             "Constraints":null,
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                    {% if key == 'DATABASE_USERNAME' %}
+                "DATABASE_USERNAME": "{{ runtime['DATABASE_SUPER_USERNAME'] }}",
+                "DATABASE_NORMAL_USERNAME": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                    {% elif key == 'DATABASE_PASSWORD' %}
+                "DATABASE_PASSWORD": "{{ runtime['DATABASE_SUPER_PASSWORD'] }}",
+                "DATABASE_NORMAL_PASSWORD": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                    {% else %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                    {% endif %}
+                {% endfor %}
+            },
+            "Leader":true,
             "Services":[
               {
-                "Name":"{{ product }}",
+                "Name":"{{ environment }}-{{ product }}-batch",
                 "Tags":[
                   "{{ product }}",
-                  "{{ environment }}"],
-                "PortLabel":"web",
-                "Checks":[
-                  {
-                    "Id":"",
-                    "Name":"{{ product }}-status",
-                    "Type":"http",
-                    "Command":"",
-                    "Args":null,
-                    "Path":"/healthcheck",
-                    "Protocol":"",
-                    "Interval":10000000000,
-                    "Timeout":2000000000
-                  }
+                  "{{ environment }}",
+                  "batch"
                 ]
               }
             ],
             "Resources":{
-              "CPU":1000,
-              "MemoryMB":6000,
+              "CPU":500,
+              "MemoryMB":256,
               "IOPS":0,
-              "Networks":[
-                {
-                  "DynamicPorts":[
-                    {
-                      "Label":"web"
-                    }
-                  ],
-                  "MBits":10
-                }
-              ]
-            },
-            "Meta":{
-              "foo":"bar",
-              "baz":"pipe"
+              "Networks":[ { "MBits":10 } ]
             },
             "KillTimeout":5000000000,
             "LogConfig":{
@@ -113,14 +100,10 @@
         "RestartPolicy":{
           "Interval":90000000000,
           "Attempts":5,
-          "Delay":5000000000,
+          "Delay":15000000000,
           "Mode":"delay"
         }
       }
-    ],
-    "Update":{
-      "Stagger":{{ stagger }},
-      "MaxParallel":{{ max_parallel }}
-    }
+    ]
   }
 }
