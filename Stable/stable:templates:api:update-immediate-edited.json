@@ -22,14 +22,16 @@
           {
             "Name":"{{ environment }}-sidekiq",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[ ],
               "command": "bundle",
-              "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ],
+              "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ]
             },
             "Constraints":null,
+            "Env":{
+              "MALLOC_ARENA_MAX": "2"
+            },
             "Templates": [
               {
                 "SourcePath": "",
@@ -39,7 +41,8 @@
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",
-                "RightDelim": "))"
+                "RightDelim": "))",
+                "Envvars": true
               }
             ],
             "Services":[
@@ -130,7 +133,8 @@
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",
-                "RightDelim": "))"
+                "RightDelim": "))",
+                "Envvars": true
               }
             ],
             "Services":[
