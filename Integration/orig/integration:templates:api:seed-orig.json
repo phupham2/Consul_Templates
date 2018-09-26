@@ -27,7 +27,7 @@
               "image":"{{ image }}",
               "command": "bundle",
               "args":[
-                  "exec", "rake", "db:migrate", "db:grant"
+                  "exec", "rake", "db:seed:{{ environment }}"
               ]
             },
             "Constraints":null,
@@ -58,8 +58,7 @@
             "Resources":{
               "CPU":500,
               "MemoryMB":256,
-              "IOPS":0,
-              "Networks":[ { "MBits":10 } ]
+              "IOPS":0
             },
             "KillTimeout":5000000000,
             "LogConfig":{
@@ -68,7 +67,7 @@
             }
           },
           {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
+            "Name":"{{ environment }}-{{ product }}-batch-rsyslog",
             "Driver":"docker",
             "Config":{
               "image":"blinker/rsyslog:latest",

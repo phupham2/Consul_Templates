@@ -52,7 +52,15 @@
             "Constraints":null,
             "Env":{
                 {% for key, value in runtime.iteritems() %}
+                    {% if key == 'DATABASE_USERNAME' %}
+                "DATABASE_USERNAME": "{{ runtime['DATABASE_SUPER_USERNAME'] }}",
+                "DATABASE_NORMAL_USERNAME": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                    {% elif key == 'DATABASE_PASSWORD' %}
+                "DATABASE_PASSWORD": "{{ runtime['DATABASE_SUPER_PASSWORD'] }}",
+                "DATABASE_NORMAL_PASSWORD": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                    {% else %}
                 "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                    {% endif %}
                 {% endfor %}
             },
             "Services":[

@@ -1,3 +1,4 @@
+staging-brochure
 {
   "Job":{
     "Region":"us-west-2",
@@ -17,11 +18,7 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-          },
-          {
-            "Operand": "distinct_hosts",
-            "Value": true
-          },
+          }
         ],
         "Tasks":[
           {
@@ -36,6 +33,19 @@
               ]
             },
             "Constraints":null,
+            "Templates": [
+              {
+                "SourcePath": "",
+                "DestPath": "secrets/vars.env",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}/default\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "ChangeMode": "noop",
+                "ChangeSignal": "",
+                "Perms": "0644",
+                "LeftDelim": "((",
+                "RightDelim": "))",
+                "Envvars": true
+              }
+            ],
             "Services":[
               {
                 "Name":"{{ environment }}-{{ product }}",
@@ -60,8 +70,8 @@
               }
             ],
             "Resources":{
-              "CPU":200,
-              "MemoryMB":256,
+              "CPU":500,
+              "MemoryMB":512,
               "IOPS":0,
               "Networks":[
                 {

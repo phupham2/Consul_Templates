@@ -18,10 +18,11 @@
             "RTarget": "{{ environment }}_app",
             "Operand": "="
             },
-            {"Operand": "distinct_hosts",
-              "Value": true
+            {
+            "Operand": "distinct_hosts",
+            "Value": true
             }
-            ],
+        ],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
@@ -98,7 +99,7 @@
                 "MaxFileSizeMB":10
             }
           },
-          {
+            {
             "Name":"{{ environment }}-{{ product }}-rsyslog",
             "Driver":"docker",
             "Config":{
