@@ -31,7 +31,6 @@
               ]
             },
             "Constraints":null,
-<<<<<<< HEAD:Staging/staging:templates:api:seed-edited.json
             "Env":{
                 {% for key, value in runtime.iteritems() %}
                     {% if key == 'DATABASE_USERNAME' %}
@@ -46,21 +45,6 @@
                 {% endfor %}
             },
             "Leader":true,
-=======
-            "Templates": [
-              {
-                "SourcePath": "",
-                "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
-                "ChangeSignal": "",
-                "Perms": "0644",
-                "LeftDelim": "((",
-                "RightDelim": "))",
-                "Envvars": true
-              }
-            ],
->>>>>>> 6cc2fa9f8ccd6c491abc83096a0b5659f8aef902:Stable/stable:templates:api:update-edited3.json
             "Services":[
               {
                 "Name":"{{ environment }}-{{ product }}-batch",

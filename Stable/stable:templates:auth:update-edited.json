@@ -36,11 +36,6 @@
               ],
             },
             "Constraints":null,
-            "Env":{
-                {% for key, value in runtime.iteritems() %}
-                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
-                {% endfor %}
-            },
             "Templates": [
               {
                 "SourcePath": "",
@@ -50,7 +45,8 @@
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",
-                "RightDelim": "))"
+                "RightDelim": "))",
+                "Envvars": true
               }
             ],
             "Services":[
