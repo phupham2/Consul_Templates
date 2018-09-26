@@ -25,10 +25,7 @@
             "Driver":"docker",
             "Config":{
               "image":"{{ image }}",
-              "command": "bundle",
-              "args":[
-                  "exec", "rake", "db:migrate", "db:grant"
-              ]
+              "command": "bundle"
             },
             "Constraints":null,
             "Env":{
@@ -76,7 +73,7 @@
             },
             "Constraints":null,
             "Services":[
-              {
+            {
                 "Name":"rsyslog",
                 "Tags":[
                   "{{ product }}",

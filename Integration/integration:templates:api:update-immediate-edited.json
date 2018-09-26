@@ -22,6 +22,7 @@
           {
             "Name":"{{ environment }}-sidekiq",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[ ],
@@ -30,8 +31,16 @@
             },
             "Constraints":null,
             "Env":{
+<<<<<<< HEAD
                 "MALLOC_ARENA_MAX": "2"
               },
+=======
+                "MALLOC_ARENA_MAX": "2",
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
+>>>>>>> 6cc2fa9f8ccd6c491abc83096a0b5659f8aef902
             "Templates": [
               {
                 "SourcePath": "",
@@ -69,33 +78,33 @@
             }
           },
           {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
+          "Name":"{{ environment }}-{{ product }}-rsyslog",
+          "Driver":"docker",
+          "Config":{
+            "image":"blinker/rsyslog:latest",
+            "hostname": "${attr.unique.hostname}"
+          },
+          "Constraints":null,
+          "Services":[
+            {
+              "Name":"rsyslog",
+              "Tags":[
+                "{{ product }}",
+                "{{ environment }}"
+              ]
             }
+          ],
+          "Resources":{
+            "CPU":100,
+            "MemoryMB":16,
+            "IOPS":0
+          },
+          "KillTimeout":5000000000,
+          "LogConfig":{
+            "MaxFiles":10,
+            "MaxFileSizeMB":10
           }
+        }
         ],
         "RestartPolicy":{
           "Interval":90000000000,
@@ -124,6 +133,11 @@
               "args":["exec", "clockwork", "./config/schedule.rb"]
             },
             "Constraints":null,
+            "Env":{
+                {% for key, value in runtime.iteritems() %}
+                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
+                {% endfor %}
+            },
             "Templates": [
               {
                 "SourcePath": "",
@@ -162,33 +176,33 @@
             }
           },
           {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
+          "Name":"{{ environment }}-{{ product }}-rsyslog",
+          "Driver":"docker",
+          "Config":{
+            "image":"blinker/rsyslog:latest",
+            "hostname": "${attr.unique.hostname}"
+          },
+          "Constraints":null,
+          "Services":[
+            {
+              "Name":"rsyslog",
+              "Tags":[
+                "{{ product }}",
+                "{{ environment }}"
+              ]
             }
+          ],
+          "Resources":{
+            "CPU":100,
+            "MemoryMB":16,
+            "IOPS":0
+          },
+          "KillTimeout":5000000000,
+          "LogConfig":{
+            "MaxFiles":10,
+            "MaxFileSizeMB":10
           }
+        }
         ]
       }
     ]

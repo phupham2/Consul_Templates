@@ -23,11 +23,12 @@
           {
             "Name":"{{ environment }}-{{ product }}-batch",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "command": "bundle",
               "args":[
-                  "exec", "rake", "db:migrate", "db:grant"
+                  "exec", "rake", "db:seed:{{ environment }}"
               ]
             },
             "Constraints":null,

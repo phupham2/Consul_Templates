@@ -1,65 +1,80 @@
 {
   "Job":{
     "Region":"us-west-2",
-    "ID":"{{ environment }}-{{ product }}-batch",
-    "Name":"{{ environment }}-{{ product }}-batch",
-    "Type":"batch",
+    "ID":"{{ environment }}-{{ product }}",
+    "Name":"{{ environment }}-{{ product }}",
+    "Type":"service",
     "Priority":50,
     "AllAtOnce":false,
     "Datacenters":[
       "us-west-2a"
     ],
-    "Constraints": [{
-        "LTarget": "${node.class}",
-        "RTarget": "{{ environment }}_app",
-        "Operand": "="
-    }],
     "TaskGroups":[
       {
-        "Name":"{{ environment }}-{{ product }}-batch",
-        "Count":1,
-        "Constraints":null,
+        "Name":"{{ environment }}-{{ product }}",
+        "Count":2,
+        "Constraints": [{
+            "LTarget": "${node.class}",
+            "RTarget": "{{ environment }}_app",
+            "Operand": "="
+          },
+          {
+            "Operand": "distinct_hosts",
+            "Value": true
+          }
+        ],
+
         "Tasks":[
           {
-            "Name":"{{ environment }}-{{ product }}-batch",
+            "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
             "Config":{
               "image":"{{ image }}",
-              "command": "bundle",
-              "args":[
-                  "exec", "rake", "db:migrate", "db:grant"
+              "port_map":[
+                {
+                  "web":3001
+                }
               ]
             },
             "Constraints":null,
-            "Env":{
-                {% for key, value in runtime.iteritems() %}
-                    {% if key == 'DATABASE_USERNAME' %}
-                "DATABASE_USERNAME": "{{ runtime['DATABASE_SUPER_USERNAME'] }}",
-                "DATABASE_NORMAL_USERNAME": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
-                    {% elif key == 'DATABASE_PASSWORD' %}
-                "DATABASE_PASSWORD": "{{ runtime['DATABASE_SUPER_PASSWORD'] }}",
-                "DATABASE_NORMAL_PASSWORD": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
-                    {% else %}
-                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
-                    {% endif %}
-                {% endfor %}
-            },
-            "Leader":true,
             "Services":[
               {
-                "Name":"{{ environment }}-{{ product }}-batch",
+                "Name":"{{ environment }}-brochure",
                 "Tags":[
                   "{{ product }}",
                   "{{ environment }}",
-                  "batch"
+                  "internal"
+                ],
+                "PortLabel":"web",
+                "Checks":[
+                  {
+                    "Id":"",
+                    "Name":"{{ product }}-status",
+                    "Type":"http",
+                    "Command":"",
+                    "Args":null,
+                    "Path":"/health-check",
+                    "Protocol":"",
+                    "Interval":10000000000,
+                    "Timeout":2000000000
+                  }
                 ]
               }
             ],
             "Resources":{
-              "CPU":500,
+              "CPU":200,
               "MemoryMB":256,
               "IOPS":0,
-              "Networks":[ { "MBits":10 } ]
+              "Networks":[
+                {
+                  "DynamicPorts":[
+                    {
+                      "Label":"web"
+                    }
+                  ],
+                  "MBits":10
+                }
+              ]
             },
             "KillTimeout":5000000000,
             "LogConfig":{
@@ -99,10 +114,14 @@
         "RestartPolicy":{
           "Interval":90000000000,
           "Attempts":5,
-          "Delay":15000000000,
+          "Delay":5000000000,
           "Mode":"delay"
         }
       }
-    ]
+    ],
+    "Update":{
+      "Stagger":{{ stagger }},
+      "MaxParallel":{{ max_parallel }}
+    }
   }
 }
