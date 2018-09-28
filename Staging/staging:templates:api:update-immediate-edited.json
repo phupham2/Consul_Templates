@@ -29,14 +29,11 @@
               "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ]
             },
             "Constraints":null,
-            "Env":{
-              "MALLOC_ARENA_MAX": "2"
-            },
             "Templates": [
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "EmbeddedTmpl": "MALLOC_ARENA_MAX=2\n((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",

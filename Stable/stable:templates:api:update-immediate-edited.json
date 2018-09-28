@@ -116,20 +116,18 @@
           {
             "Name":"{{ environment }}-clockwork",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[ ],
               "command":"bundle",
-              "args":["exec", "clockwork", "./config/schedule.rb"],
+              "args":["exec", "clockwork", "./config/schedule.rb"]
             },
             "Constraints":null,
             "Templates": [
               {
                 "SourcePath": "",
                 "DestPath": "secrets/vars.env",
-                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
-                "ChangeMode": "noop",
+                "EmbeddedTmpl": "MALLOC_ARENA_MAX=2\n((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",                "ChangeMode": "noop",
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",

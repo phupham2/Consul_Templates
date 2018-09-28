@@ -17,15 +17,12 @@
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
             "Operand": "="
-        },
-          {
-            "Operand": "distinct_hosts",
-            "Value": true
-            }],
+        }],
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
@@ -98,33 +95,33 @@
             }
           },
           {
-            "Name":"{{ environment }}-{{ product }}-rsyslog",
-            "Driver":"docker",
-            "Config":{
-              "image":"blinker/rsyslog:latest",
-              "hostname": "${attr.unique.hostname}"
-            },
-            "Constraints":null,
-            "Services":[
-              {
-                "Name":"rsyslog",
-                "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}"
-                ]
-              }
-            ],
-            "Resources":{
-              "CPU":100,
-              "MemoryMB":16,
-              "IOPS":0
-            },
-            "KillTimeout":5000000000,
-            "LogConfig":{
-              "MaxFiles":10,
-              "MaxFileSizeMB":10
+          "Name":"{{ environment }}-{{ product }}-rsyslog",
+          "Driver":"docker",
+          "Config":{
+            "image":"blinker/rsyslog:latest",
+            "hostname": "${attr.unique.hostname}"
+          },
+          "Constraints":null,
+          "Services":[
+            {
+              "Name":"rsyslog",
+              "Tags":[
+                "{{ product }}",
+                "{{ environment }}"
+              ]
             }
+          ],
+          "Resources":{
+            "CPU":100,
+            "MemoryMB":16,
+            "IOPS":0
+          },
+          "KillTimeout":5000000000,
+          "LogConfig":{
+            "MaxFiles":10,
+            "MaxFileSizeMB":10
           }
+        }
         ],
         "RestartPolicy":{
           "Interval":90000000000,
