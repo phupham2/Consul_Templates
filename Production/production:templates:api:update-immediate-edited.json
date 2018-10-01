@@ -1,0 +1,194 @@
+{
+  "Job":{
+    "Region":"us-west-2",
+    "ID":"{{ environment }}-{{ product }}-background",
+    "Name":"{{ environment }}-{{ product }}-background",
+    "Type":"service",
+    "Priority":50,
+    "AllAtOnce":false,
+    "Datacenters":[
+      "us-west-2a"
+    ],
+    "TaskGroups":[
+      {
+        "Name":"{{ environment }}-sidekiq",
+        "Count":1,
+        "Constraints": [{
+            "LTarget": "${node.class}",
+            "RTarget": "{{ environment }}_worker",
+            "Operand": "="
+        }],
+        "Tasks":[
+          {
+            "Name":"{{ environment }}-sidekiq",
+            "Driver":"docker",
+            "User":"root",
+            "Config":{
+              "image":"{{ image }}",
+              "port_map":[ ],
+              "command": "bundle",
+              "args": [ "exec", "sidekiq", "-v", "-C", "./config/sidekiq.yml" ]
+            },
+            "Constraints":null,
+            "Templates": [
+              {
+                "SourcePath": "",
+                "DestPath": "secrets/vars.env",
+                "EmbeddedTmpl": "MALLOC_ARENA_MAX=2\n((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "ChangeMode": "noop",
+                "ChangeSignal": "",
+                "Perms": "0644",
+                "LeftDelim": "((",
+                "RightDelim": "))",
+                "Envvars": true
+              }
+            ],
+            "Services":[
+              {
+                "Name":"{{ environment }}-sidekiq",
+                "Tags":[
+                  "{{ product }}",
+                  "{{ environment }}",
+                  "sidekiq"
+                ],
+                "Checks":[ ]
+              }
+            ],
+            "Resources":{
+              "CPU":2000,
+              "MemoryMB":6144,
+              "IOPS":0,
+              "Networks":[ { "MBits":10 } ]
+            },
+            "KillTimeout":5000000000,
+            "LogConfig":{
+                "MaxFiles":10,
+                "MaxFileSizeMB":10
+            }
+          },
+          {
+          "Name":"{{ environment }}-{{ product }}-rsyslog",
+          "Driver":"docker",
+          "Config":{
+            "image":"blinker/rsyslog:latest",
+            "hostname": "${attr.unique.hostname}"
+          },
+          "Constraints":null,
+          "Services":[
+            {
+              "Name":"rsyslog",
+              "Tags":[
+                "{{ product }}",
+                "{{ environment }}"
+              ]
+            }
+          ],
+          "Resources":{
+            "CPU":100,
+            "MemoryMB":16,
+            "IOPS":0
+          },
+          "KillTimeout":5000000000,
+          "LogConfig":{
+            "MaxFiles":10,
+            "MaxFileSizeMB":10
+          }
+        }
+        ],
+        "RestartPolicy":{
+          "Interval":90000000000,
+          "Attempts":1,
+          "Delay":15000000000,
+          "Mode":"fail"
+        }
+      },
+      {
+        "Name":"{{ environment }}-clockwork",
+        "Count":1,
+        "Constraints": [{
+            "LTarget": "${node.class}",
+            "RTarget": "{{ environment }}_worker",
+            "Operand": "="
+        }],
+        "Tasks":[
+          {
+            "Name":"{{ environment }}-clockwork",
+            "Driver":"docker",
+            "User":"root",
+            "Config":{
+              "image":"{{ image }}",
+              "port_map":[ ],
+              "command":"bundle",
+              "args":["exec", "clockwork", "./config/schedule.rb"]
+            },
+            "Constraints":null,
+            "Templates": [
+              {
+                "SourcePath": "",
+                "DestPath": "secrets/vars.env",
+                "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
+                "ChangeMode": "noop",
+                "ChangeSignal": "",
+                "Perms": "0644",
+                "LeftDelim": "((",
+                "RightDelim": "))",
+                "Envvars": true
+              }
+            ],
+            "Services":[
+              {
+                "Name":"{{ environment }}-clockwork",
+                "Tags":[
+                  "{{ product }}",
+                  "{{ environment }}",
+                  "clockwork"
+                ],
+                "Checks":[ ]
+              }
+            ],
+            "Resources":{
+              "CPU":200,
+              "MemoryMB":512,
+              "IOPS":0,
+              "Networks":[ { "MBits":10 } ]
+            },
+            "Meta":{},
+            "KillTimeout":5000000000,
+            "LogConfig":{
+                "MaxFiles":10,
+                "MaxFileSizeMB":10
+            }
+          },
+          {
+            "Name":"{{ environment }}-{{ product }}-rsyslog",
+            "Driver":"docker",
+            "Config":{
+              "image":"blinker/rsyslog:latest",
+              "hostname": "${attr.unique.hostname}"
+            },
+            "Constraints":null,
+            "Services":[
+              {
+                "Name":"rsyslog",
+                "Tags":[
+                  "{{ product }}",
+                  "{{ environment }}"
+                ]
+              }
+            ],
+            "Resources":{
+              "CPU":100,
+              "MemoryMB":16,
+              "IOPS":0
+            },
+            "KillTimeout":5000000000,
+            "LogConfig":{
+              "MaxFiles":10,
+              "MaxFileSizeMB":10
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

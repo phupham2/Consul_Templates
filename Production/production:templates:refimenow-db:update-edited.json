@@ -12,10 +12,10 @@
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
-        "Count":6,
+        "Count":1,
         "Constraints": [{
             "LTarget": "${node.class}",
-            "RTarget": "{{ environment }}_app",
+            "RTarget": "{{ environment }}_refimenow",
             "Operand": "="
         }],
         "Tasks":[
@@ -27,16 +27,14 @@
               "image":"{{ image }}",
               "port_map":[
                 {
-                  "web":8080
+                  "web":5000
                 }
+              ],
+              "volumes": [
+                  "/tmp/refimenow-db:/tmp/refimenow-db"
               ]
             },
             "Constraints":null,
-            "Env":{
-                {% for key, value in runtime.iteritems() %}
-                "{{ key }}": "{{ value }}"{{ ',' if loop.index < runtime|length else '' }}
-                {% endfor %}
-            },
             "Templates": [
               {
                 "SourcePath": "",
@@ -46,7 +44,8 @@
                 "ChangeSignal": "",
                 "Perms": "0644",
                 "LeftDelim": "((",
-                "RightDelim": "))"
+                "RightDelim": "))",
+                "Envvars": true
               }
             ],
             "Services":[
@@ -54,10 +53,7 @@
                 "Name":"{{ product }}",
                 "Tags":[
                   "{{ product }}",
-                  "{{ environment }}",
-                  "web",
-                  "internal"
-                ],
+                  "{{ environment }}"],
                 "PortLabel":"web",
                 "Checks":[
                   {
@@ -66,17 +62,17 @@
                     "Type":"http",
                     "Command":"",
                     "Args":null,
-                    "Path":"/status?key={{ runtime.STATUS_KEY }}",
+                    "Path":"/healthcheck",
                     "Protocol":"",
                     "Interval":10000000000,
-                    "Timeout":4000000000
+                    "Timeout":2000000000
                   }
                 ]
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":2048,
+              "CPU":1000,
+              "MemoryMB":6000,
               "IOPS":0,
               "Networks":[
                 {
@@ -85,7 +81,7 @@
                       "Label":"web"
                     }
                   ],
-                  "MBits":100
+                  "MBits":10
                 }
               ]
             },
