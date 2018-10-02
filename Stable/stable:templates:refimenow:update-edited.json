@@ -12,7 +12,7 @@
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
-        "Count":6,
+        "Count":2,
         "Constraints": [{
             "LTarget": "${node.class}",
             "RTarget": "{{ environment }}_app",
@@ -22,11 +22,12 @@
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
+            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[
                 {
-                  "web":8080
+                  "web":5000
                 }
               ]
             },
@@ -50,7 +51,6 @@
                 "Tags":[
                   "{{ product }}",
                   "{{ environment }}",
-                  "web",
                   "internal"
                 ],
                 "PortLabel":"web",
@@ -61,17 +61,17 @@
                     "Type":"http",
                     "Command":"",
                     "Args":null,
-                    "Path":"/status?key={{ runtime.STATUS_KEY }}",
+                    "Path":"/healthcheck",
                     "Protocol":"",
                     "Interval":10000000000,
-                    "Timeout":4000000000
+                    "Timeout":2000000000
                   }
                 ]
               }
             ],
             "Resources":{
               "CPU":500,
-              "MemoryMB":2048,
+              "MemoryMB":256,
               "IOPS":0,
               "Networks":[
                 {
@@ -80,7 +80,7 @@
                       "Label":"web"
                     }
                   ],
-                  "MBits":100
+                  "MBits":10
                 }
               ]
             },

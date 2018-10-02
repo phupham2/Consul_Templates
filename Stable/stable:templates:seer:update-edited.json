@@ -5,26 +5,54 @@
     "Name":"{{ environment }}-{{ product }}",
     "Type":"service",
     "Priority":50,
-    "AllAtOnce":false,
+    "AllAtOnce": false,
     "Datacenters":[
       "us-west-2a"
     ],
+    "Constraints": [{
+        "LTarget": "${node.class}",
+        "RTarget": "{{ environment }}_app_gpu",
+        "Operand": "="
+    }],
     "TaskGroups":[
       {
         "Name":"{{ environment }}-{{ product }}",
-        "Count":6,
-        "Constraints": [{
-            "LTarget": "${node.class}",
-            "RTarget": "{{ environment }}_app",
-            "Operand": "="
-        }],
+        "Count": 4,
+        "Constraints":null,
         "Tasks":[
           {
             "Name":"{{ environment }}-{{ product }}",
             "Driver":"docker",
+            "User":"root",
             "Config":{
-              "image":"{{ image }}",
-              "port_map":[
+              "image":"{{ image }}-gpu",
+              "devices": [
+                {
+                  "host_path" : "/dev/nvidiactl",
+                  "container_path" : "/dev/nvidiactl",
+                  "cgroup_permissions": "rwm"
+                },
+                {
+                  "host_path" : "/dev/nvidia-uvm",
+                  "container_path" : "/dev/nvidia-uvm",
+                  "cgroup_permissions": "rwm"
+                },
+                {
+                  "host_path" : "/dev/nvidia-uvm-tools",
+                  "container_path" : "/dev/nvidia-uvm-tools",
+                  "cgroup_permissions": "rwm"
+                },
+                {
+                  "host_path" : "/dev/nvidia0",
+                  "container_path" : "/dev/nvidia0",
+                  "cgroup_permissions": "rwm"
+                }
+              ],
+              "volumes": [
+                "nvidia_driver_384.111:/usr/local/nvidia"
+              ],
+              "volume_driver": "nvidia-docker",
+              "port_map": [
                 {
                   "web":8080
                 }
@@ -38,20 +66,22 @@
                 "EmbeddedTmpl": "((range ls \"{{environment}}/env/{{product}}\"))((.Key))=((.Value | toJSON ))\n((end))",
                 "ChangeMode": "noop",
                 "ChangeSignal": "",
+                "Splay": 5000000000,
                 "Perms": "0644",
                 "LeftDelim": "((",
                 "RightDelim": "))",
                 "Envvars": true
               }
             ],
+            "Env":{
+                "CONTAINER_NAME": "${NOMAD_TASK_NAME}.${NOMAD_ALLOC_ID}.${NOMAD_ALLOC_INDEX}"
+            },
             "Services":[
               {
-                "Name":"{{ product }}",
+                "Name":"{{ environment }}-{{ product }}",
                 "Tags":[
-                  "{{ product }}",
-                  "{{ environment }}",
-                  "web",
-                  "internal"
+                  "internal",
+                  "{{ environment }}"
                 ],
                 "PortLabel":"web",
                 "Checks":[
@@ -61,26 +91,26 @@
                     "Type":"http",
                     "Command":"",
                     "Args":null,
-                    "Path":"/status?key={{ runtime.STATUS_KEY }}",
+                    "Path":"/",
                     "Protocol":"",
                     "Interval":10000000000,
-                    "Timeout":4000000000
+                    "Timeout":2000000000
                   }
                 ]
               }
             ],
             "Resources":{
-              "CPU":500,
-              "MemoryMB":2048,
+              "CPU":2000,
+              "MemoryMB":12288,
               "IOPS":0,
               "Networks":[
                 {
+                  "MBits":10,
                   "DynamicPorts":[
                     {
                       "Label":"web"
                     }
-                  ],
-                  "MBits":100
+                  ]
                 }
               ]
             },
@@ -125,15 +155,15 @@
         ],
         "RestartPolicy":{
           "Interval":90000000000,
-          "Attempts":5,
-          "Delay":5000000000,
+          "Attempts":4,
+          "Delay":15000000000,
           "Mode":"delay"
         }
       }
     ],
-    "Update":{
-      "Stagger":{{ stagger }},
-      "MaxParallel":{{ max_parallel }}
+    "Update": {
+      "MaxParallel": 4,
+      "Stagger": {{ stagger }}
     }
   }
 }

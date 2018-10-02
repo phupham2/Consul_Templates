@@ -22,7 +22,6 @@
           {
             "Name":"{{ environment }}-sidekiq",
             "Driver":"docker",
-            "User":"root",
             "Config":{
               "image":"{{ image }}",
               "port_map":[ ],
